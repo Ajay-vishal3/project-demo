@@ -4,6 +4,9 @@ import com.cts.entity.Order;
 import com.cts.entity.OrderStatus;
 import com.cts.entity.PaymentStatus;
 import com.cts.service.OrderService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -11,40 +14,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
-	private final OrderService orderService;
 
-	public OrderController(OrderService orderService) {
-		this.orderService = orderService;
-	}
+    @Autowired
+    private OrderService orderService;
 
-	@PostMapping
-	public ResponseEntity<Order> placeOrder(@RequestBody Order order) {
-		return ResponseEntity.ok(orderService.placeOrder(order));
-	}
+    @PostMapping("/place")
+    public ResponseEntity<Order> placeOrder(
+            @RequestParam Long userId,
+            @RequestParam String shippingAddress) {
 
-	@GetMapping
-	public ResponseEntity<List<Order>> getAllOrders() {
-		return ResponseEntity.ok(orderService.getAllOrders());
-	}
+        Order order = orderService.placeOrder(userId, shippingAddress);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
+    }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<Order> getOrder(@PathVariable Long id) {
-		return ResponseEntity.ok(orderService.getOrderById(id));
-	}
-
-	@PutMapping("/{id}/status")
-	public ResponseEntity<Order> updateOrderStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
-		return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
-	}
-
-	@PutMapping("/{id}/payment")
-	public ResponseEntity<Order> updatePaymentStatus(@PathVariable Long id, @RequestParam PaymentStatus status) {
-		return ResponseEntity.ok(orderService.updatePaymentStatus(id, status));
-	}
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-		orderService.deleteOrder(id);
-		return ResponseEntity.noContent().build();
-	}
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
+        return ResponseEntity.ok(orderService.getUserOrders(userId));
+    }
 }

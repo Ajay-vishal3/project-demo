@@ -2,45 +2,49 @@ package com.cts.service;
 
 import com.cts.entity.CartItem;
 import com.cts.entity.Product;
+import com.cts.entity.User;
 import com.cts.exception.ResourceNotFoundException;
 import com.cts.repository.CartItemRepository;
 import com.cts.repository.ProductRepository;
+import com.cts.repository.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class CartItemService {
-	private final CartItemRepository cartItemRepository;
-	private final ProductRepository productRepository;
 
-	public CartItemService(CartItemRepository cartItemRepository, ProductRepository productRepository) {
-		this.cartItemRepository = cartItemRepository;
-		this.productRepository = productRepository;
-	}
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
-	public CartItem addCartItem(Long productId, int quantity,int userId) {
-		Product product = productRepository.findById(productId)
-				.orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
-		double totalPrice = product.getPrice() * quantity;
-		CartItem cartItem = CartItem.builder().product(product).quantity(quantity).totalPrice(totalPrice).build();
-		return cartItemRepository.save(cartItem);
-	}
+    @Autowired
+    private UserRepository userRepository;
 
-	public List<CartItem> getAllCartItems() {
-		return cartItemRepository.findAll();
-	}
+    @Autowired
+    private ProductRepository productRepository;
 
-	public void deleteCartItem(Long cartItemId) {
-		CartItem item = cartItemRepository.findById(cartItemId)
-				.orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + cartItemId));
-		cartItemRepository.delete(item);
-	}
+    public CartItem addToCart(Long userId, Long productId, int quantity) {
+        User user = userRepository.findById(userId)
+                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-	public CartItem updateCartItem(Long cartItemId, int newQuantity) {
-		CartItem item = cartItemRepository.findById(cartItemId)
-				.orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + cartItemId));
-		item.setQuantity(newQuantity);
-		item.setTotalPrice(item.getProduct().getPrice() * newQuantity);
-		return cartItemRepository.save(item);
-	}
+        Product product = productRepository.findById(productId)
+                          .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        CartItem cartItem = new CartItem();
+        cartItem.setUser(user);
+        cartItem.setProduct(product);
+        cartItem.setQuantity(quantity);
+        cartItem.setTotalPrice(product.getPrice() * quantity);
+
+        return cartItemRepository.save(cartItem);
+    }
+
+    public List<CartItem> getCartByUserId(Long userId) {
+        return cartItemRepository.findByUserUserId(userId);
+    }
+
+    public void deleteCartItem(Long cartItemId) {
+        cartItemRepository.deleteById(cartItemId);
+    }
 }

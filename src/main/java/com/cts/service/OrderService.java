@@ -1,50 +1,60 @@
 package com.cts.service;
 
+import com.cts.entity.CartItem;
 import com.cts.entity.Order;
 import com.cts.entity.OrderStatus;
 import com.cts.entity.PaymentStatus;
+import com.cts.entity.User;
 import com.cts.exception.ResourceNotFoundException;
+import com.cts.repository.CartItemRepository;
 import com.cts.repository.OrderRepository;
+import com.cts.repository.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class OrderService {
-	private final OrderRepository orderRepository;
 
-	public OrderService(OrderRepository orderRepository) {
-		this.orderRepository = orderRepository;
-	}
+    @Autowired
+    private OrderRepository orderRepository;
 
-	public Order placeOrder(Order order) {
-		order.setOrderStatus(OrderStatus.PENDING);
-		order.setPaymentStatus(PaymentStatus.PENDING);
-		return orderRepository.save(order);
-	}
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
-	public List<Order> getAllOrders() {
-		return orderRepository.findAll();
-	}
+    @Autowired
+    private UserRepository userRepository;
 
-	public Order getOrderById(Long id) {
-		return orderRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
-	}
+    public Order placeOrder(Long userId, String shippingAddress) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-	public Order updateOrderStatus(Long id, OrderStatus status) {
-		Order order = getOrderById(id);
-		order.setOrderStatus(status);
-		return orderRepository.save(order);
-	}
+        List<CartItem> cartItems = cartItemRepository.findByUserUserId(userId);
 
-	public Order updatePaymentStatus(Long id, PaymentStatus status) {
-		Order order = getOrderById(id);
-		order.setPaymentStatus(status);
-		return orderRepository.save(order);
-	}
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Cart is empty. Cannot place order.");
+        }
 
-	public void deleteOrder(Long id) {
-		Order order = getOrderById(id);
-		orderRepository.delete(order);
-	}
+        double totalPrice = cartItems.stream()
+                .mapToDouble(CartItem::getTotalPrice)
+                .sum();
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setShippingAddress(shippingAddress);
+        order.setTotalPrice(totalPrice);
+        order.setOrderStatus("Pending");
+        order.setPaymentStatus("Pending");
+
+        Order savedOrder = orderRepository.save(order);
+
+        cartItemRepository.deleteAll(cartItems); // Clear cart after placing order
+
+        return savedOrder;
+    }
+
+    public List<Order> getUserOrders(Long userId) {
+        return orderRepository.findByUserUserId(userId);
+    }
 }
