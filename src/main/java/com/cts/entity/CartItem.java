@@ -17,7 +17,8 @@ public class CartItem {
 	private Product product;
 	private int quantity;
 	private double totalPrice;
-	@OneToOne
-	@JoinColumn(name="user_id")
-	private User user;
+	@ManyToOne // Updated mapping
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+	
 }

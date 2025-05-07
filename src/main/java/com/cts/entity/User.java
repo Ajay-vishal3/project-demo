@@ -1,5 +1,7 @@
 package com.cts.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +13,7 @@ import lombok.*;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(unique = true)
 	private Long userId;
 	private String name;
 	@Column(unique = true)
@@ -18,6 +21,6 @@ public class User {
 	private String password;
 	private String shippingAddress;
 	private String paymentDetails;
-//	@OneToOne(mappedBy="user",cascade=CascadeType.ALL)
-//	private CartItem cartItem;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems;
 }
