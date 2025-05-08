@@ -3,6 +3,8 @@ package com.cts.controller;
 import com.cts.dto.LoginRequest;
 import com.cts.entity.User;
 import com.cts.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -10,11 +12,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-	private final UserService userService;
+	@Autowired
+	private  UserService userService;
 
-	public UserController(UserService userService) {
-		this.userService = userService;
-	}
 
 	@PostMapping("/register")
 	public ResponseEntity<User> register(@RequestBody User user) {

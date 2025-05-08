@@ -1,5 +1,6 @@
 package com.cts.controller;
 
+import com.cts.dto.OrderDTO;
 import com.cts.entity.Order;
 import com.cts.entity.OrderStatus;
 import com.cts.entity.PaymentStatus;
@@ -27,8 +28,13 @@ public class OrderController {
         return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
+//        return ResponseEntity.ok(orderService.getUserOrders(userId));
+//    }
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
+    public ResponseEntity<List<OrderDTO>> getUserOrders(@PathVariable Long userId) {
         return ResponseEntity.ok(orderService.getUserOrders(userId));
     }
+
 }
