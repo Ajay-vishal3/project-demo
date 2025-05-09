@@ -1,6 +1,7 @@
 package com.cts.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,7 @@ public class UserService {
 		user.setPassword(encrypt.encode(user.getPassword()));
 		return repo.save(user);
 	}
+	
 	public String verify(Users user) {
 		Authentication authentication=authman.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
 		if(authentication.isAuthenticated()) {
@@ -35,10 +37,13 @@ public class UserService {
 			return "Failure";
 		}
 }
+	@PreAuthorize("hasRole('ADMIN')")
 	public Users update(Users user) {
+		System.out.print(user.getRoles());
 		Users temp_user=repo.findByUserName(user.getUserName());
 		temp_user.setUserName(user.getUserName());
 		temp_user.setPassword(encrypt.encode(user.getPassword()));	
+		temp_user.setRoles(user.getRoles());
 		repo.save(temp_user);
 		return temp_user;
 		

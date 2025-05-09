@@ -18,7 +18,7 @@ public class UserDetail implements UserDetails{
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
-		return Collections.singleton(new SimpleGrantedAuthority("USER"));
+		return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRoles()));
 	}
 
 	@Override
