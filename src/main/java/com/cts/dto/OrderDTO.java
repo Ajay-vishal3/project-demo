@@ -1,13 +1,10 @@
-
-
 package com.cts.dto;
-
-
 
 import java.util.List;
 
 public class OrderDTO {
     private String username;
+    private List<ProductItemDTO> products;
     public String getUsername() {
 		return username;
 	}
@@ -38,9 +35,9 @@ public class OrderDTO {
 	public void setPaymentStatus(String paymentStatus) {
 		this.paymentStatus = paymentStatus;
 	}
-	private List<ProductItemDTO> products;
-    private double totalPrice;
+	private double totalPrice;
     private String orderStatus;
     private String paymentStatus;
-	
+
+    // Getters and Setters
 }

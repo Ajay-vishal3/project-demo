@@ -1,6 +1,4 @@
 package com.cts.dto;
-
-
 public class ProductItemDTO {
     private String productName;
     public String getProductName() {
@@ -15,5 +13,14 @@ public class ProductItemDTO {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
+	public double getPrice() {
+		return price;
+	}
+	public void setPrice(double price) {
+		this.price = price;
+	}
 	private int quantity;
+    private double price;
+
+    // Getters and Setters
 }
